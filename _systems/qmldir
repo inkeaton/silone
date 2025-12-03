@@ -1,0 +1,7 @@
+module _systems
+
+singleton Time Time.qml
+singleton HyprlandXkb HyprlandXkb.qml
+
+Corners Corners.qml
+Tray Tray.qml
