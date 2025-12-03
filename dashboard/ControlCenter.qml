@@ -8,8 +8,8 @@ import "../_styles"
 PanelWindow {
     id: dashboard
 
-    anchors { top: true; right: true }
-    margins { top: 10; right: 10 }
+    anchors { top: true; left: true }
+    margins { top: 10; left: 10 }
 
     width: 400
     height: mainRect.implicitHeight
@@ -35,6 +35,16 @@ PanelWindow {
         clip: true
 
         property bool mixerExpanded: false
+            // Human-friendly device name (matches VolumeOSD logic)
+            readonly property string deviceName: {
+                const props = Pipewire.defaultAudioSink?.properties ?? {};
+                const desc = Pipewire.defaultAudioSink?.description ?? "";
+                return props["device.description"] 
+                    ?? props["node.description"] 
+                    ?? props["alsa.card.name"] 
+                    ?? desc 
+                    ?? "Unknown output";
+            }
 
         Behavior on implicitHeight {
             NumberAnimation {
@@ -122,57 +132,90 @@ PanelWindow {
                     }
                 }
 
-                // MASTER SLIDER
-                Slider {
-                    id: masterSlider
+                // MASTER SLIDER with device name above it
+                ColumnLayout {
                     Layout.fillWidth: true
-                    from: 0.0
-                    to: 1.0
+                    spacing: 6
 
-                    // 1. READ LOGIC (Matches VolumeOSD)
-                    readonly property real systemVolume: {
-                        const audio = Pipewire.defaultAudioSink?.audio;
-                        if (!audio) return 0.5;
-                        if (audio.volume !== undefined) return audio.volume;
-                        if (audio.volumes !== undefined && audio.volumes.length > 0) return audio.volumes[0];
-                        return 0.5;
+                    Text {
+                        text: mainRect.deviceName
+                        color: Styles.primary_fixed
+                        font.family: Styles.mainFont
+                        font.pixelSize: 12
+                        font.bold: true
+                        elide: Text.ElideRight
+                        Layout.fillWidth: true
                     }
 
-                    // 2. BINDING BREAK (Matches MixerEntry)
-                    // If pressing, use local value. Otherwise, follow system.
-                    value: pressed ? value : systemVolume
+                    Slider {
+                        id: masterSlider
+                        Layout.fillWidth: true
+                        from: 0.0
+                        to: 1.0
 
-                    // 3. WRITE LOGIC
-                    onMoved: {
-                        if (Pipewire.defaultAudioSink?.audio) {
-                            Pipewire.defaultAudioSink.audio.volume = value;
+                        // 1. READ LOGIC (Matches VolumeOSD)
+                        readonly property real systemVolume: {
+                            const audio = Pipewire.defaultAudioSink?.audio;
+                            if (!audio) return 0.5;
+                            if (audio.volume !== undefined) return audio.volume;
+                            if (audio.volumes !== undefined && audio.volumes.length > 0) return audio.volumes[0];
+                            return 0.5;
                         }
-                    }
-                    
-                    // Visual Style
-                    background: Rectangle {
-                        x: masterSlider.leftPadding
-                        y: masterSlider.topPadding + masterSlider.availableHeight / 2 - height / 2
-                        width: masterSlider.availableWidth
-                        height: 6
-                        radius: 3
-                        color: Styles.primary_container
-                        
-                        Rectangle {
-                            width: masterSlider.visualPosition * parent.width
-                            height: parent.height
-                            color: Styles.primary
+
+                        // Prevent binding loop: while pressing, keep the local slider value.
+                        value: pressed ? value : systemVolume
+
+                        // Write changes as the user drags (matches MixerEntry pattern).
+                        onMoved: {
+                            if (Pipewire.defaultAudioSink?.audio) {
+                                Pipewire.defaultAudioSink.audio.volume = value;
+                            }
+                        }
+
+                        // Visual Style
+                        background: Rectangle {
+                            x: masterSlider.leftPadding
+                            y: masterSlider.topPadding + masterSlider.availableHeight / 2 - height / 2
+                            width: masterSlider.availableWidth
+                            height: 6
                             radius: 3
+                            color: Styles.primary_container
+
+                            Rectangle {
+                                width: masterSlider.visualPosition * parent.width
+                                height: parent.height
+                                color: Styles.primary
+                                radius: 3
+                            }
+                            MouseArea {
+                                anchors.fill: parent
+                                hoverEnabled: true
+                                cursorShape: Qt.PointingHandCursor
+                                onPressed: {
+                                    const w = parent.width;
+                                    var frac = Math.max(0, Math.min(1, mouse.x / w));
+                                    masterSlider.value = frac;
+                                    if (Pipewire.defaultAudioSink?.audio) Pipewire.defaultAudioSink.audio.volume = frac;
+                                }
+                                onPositionChanged: {
+                                    if (pressed) {
+                                        const w = parent.width;
+                                        var frac = Math.max(0, Math.min(1, mouse.x / w));
+                                        masterSlider.value = frac;
+                                        if (Pipewire.defaultAudioSink?.audio) Pipewire.defaultAudioSink.audio.volume = frac;
+                                    }
+                                }
+                            }
                         }
-                    }
-                    
-                    handle: Rectangle {
-                        x: masterSlider.leftPadding + masterSlider.visualPosition * (masterSlider.availableWidth - width)
-                        y: masterSlider.topPadding + masterSlider.availableHeight / 2 - height / 2
-                        width: 20; height: 20; radius: 10
-                        color: Styles.primary
-                        scale: masterSlider.pressed ? 1.2 : 1.0
-                        Behavior on scale { NumberAnimation { duration: 100 } }
+
+                        handle: Rectangle {
+                            x: masterSlider.leftPadding + masterSlider.visualPosition * (masterSlider.availableWidth - width)
+                            y: masterSlider.topPadding + masterSlider.availableHeight / 2 - height / 2
+                            width: 20; height: 20; radius: 10
+                            color: Styles.primary
+                            scale: masterSlider.pressed ? 1.2 : 1.0
+                            Behavior on scale { NumberAnimation { duration: 100 } }
+                        }
                     }
                 }
 
