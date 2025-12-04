@@ -3,3 +3,4 @@ module _services
 singleton Time Time.qml
 singleton AudioService AudioService.qml
 singleton Icons Icons.qml
+singleton NotificationService NotificationService.qml

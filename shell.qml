@@ -6,21 +6,32 @@ import "./osd"
 import "./notifications"
 import "./dashboard"
 import "./_utils"
+import "./_services"
 
-// shell.qml
+// shell.qml - Main shell entry point
 import Quickshell
 import Quickshell.Io
 
 Scope {
+    // -------------------------------------------------------------------------
+    // Bar & Corners
+    // -------------------------------------------------------------------------
     Bar {}
-    
     BarCorners {}
 
-    // Launcher
+    // -------------------------------------------------------------------------
+    // Notifications (always active, auto-shows when notifications arrive)
+    // -------------------------------------------------------------------------
+    // The NotificationService singleton is auto-loaded when we import _services.
+    // The panel listens to it and shows/hides automatically.
+    NotificationPanel {}
+
+    // -------------------------------------------------------------------------
+    // Launcher (lazy-loaded popup)
+    // -------------------------------------------------------------------------
     LazyLoader {
         id: launcherLoader
         loading: true
-
         source: "./launcher/AppLauncher.qml"
     }
 
@@ -29,11 +40,12 @@ Scope {
         loader: launcherLoader
     }
 
-    // PowerMenu
+    // -------------------------------------------------------------------------
+    // PowerMenu (lazy-loaded popup)
+    // -------------------------------------------------------------------------
     LazyLoader {
         id: powermenuLoader
         loading: true
-
         source: "./powermenu/PowerMenu.qml"
     }
 
@@ -42,14 +54,9 @@ Scope {
         loader: powermenuLoader
     }
 
-    LazyLoader {
-        id: notificationLoader
-        loading: true
-
-        source: "./notifications/NotificationPanel.qml"
-    }
-
-    // shell.qml
+    // -------------------------------------------------------------------------
+    // Dashboard / Control Center (lazy-loaded popup)
+    // -------------------------------------------------------------------------
     LazyLoader {
         id: dashboardLoader
         loading: true
@@ -61,26 +68,29 @@ Scope {
         loader: dashboardLoader
     }
 
+    // -------------------------------------------------------------------------
+    // Volume OSD (always active, shows on volume change)
+    // -------------------------------------------------------------------------
     VolumeOSD {}
 
-// Toggles  
+    // -------------------------------------------------------------------------
+    // IPC Handlers for external toggle commands
+    // Usage: qs ipc call toggle <function_name>
+    // -------------------------------------------------------------------------
     IpcHandler { 
         id: ipc
         target: "toggle"  
 
-        function launcher(){
+        function launcher() {
             launcherToggle.toggle();
         }
 
-        function powermenu(){
+        function powermenu() {
             powermenuToggle.toggle();
         }
 
         function dashboard() {
             dashboardToggle.toggle();
         }
-
     }
-
 }
-

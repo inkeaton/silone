@@ -1,27 +1,13 @@
+// NotificationPanel.qml - Displays incoming notifications
+// Uses NotificationService singleton for notification management
 import Quickshell
-import Quickshell.Io
-import Quickshell.Services.Notifications
 import QtQuick
 import QtQuick.Layouts
 import "../_styles/"
+import "../_services"
 
-ShellRoot {
-    // -------------------------------------------------------------------------
-    // Notification Server
-    // -------------------------------------------------------------------------
-    NotificationServer {
-        id: notifServer
-        actionsSupported: true
-        bodyMarkupSupported: true
-        keepOnReload: true
-        persistenceSupported: true
-
-        // Track incoming notifications so they appear in the list
-        onNotification: notif => {
-            notif.tracked = true;
-            notificationWindow.visible = true;
-        }
-    }
+Scope {
+    id: root
 
     // -------------------------------------------------------------------------
     // Window
@@ -35,19 +21,24 @@ ShellRoot {
         }
 
         margins {
-            top: 10
+            top: 10  // Below bar
             right: 10
         }
         
-        width: 350
-        // Use implicitHeight to auto-collapse the window when empty
-        implicitHeight: visible ? contentColumn.implicitHeight : 0
+        // Use implicitWidth instead of deprecated width
+        implicitWidth: 350
         
-        // Only visible if we have notifications
-        visible: notifServer.trackedNotifications.length > 0
+        // Dynamic height based on content
+        implicitHeight: NotificationService.hasNotifications 
+            ? contentColumn.implicitHeight 
+            : 0
+        
+        // Only visible when there are notifications
+        visible: NotificationService.hasNotifications
         
         color: "transparent"
         
+        // Notification list container
         Column {
             id: contentColumn
             anchors {
@@ -58,24 +49,13 @@ ShellRoot {
             spacing: 8
             
             Repeater {
-                model: notifServer.trackedNotifications
-                delegate: notificationDelegateComponent
+                model: NotificationService.trackedNotifications
+                
+                delegate: NotificationDelegate {
+                    windowWidth: notificationWindow.implicitWidth
+                    bodyMarkupSupported: NotificationService.server?.bodyMarkupSupported ?? true
+                }
             }
-        }
-    }
-    
-    // -------------------------------------------------------------------------
-    // Delegate Component
-    // -------------------------------------------------------------------------
-    Component {
-        id: notificationDelegateComponent
-        
-        NotificationDelegate {
-            // Note: We do NOT assign 'notification: modelData' here.
-            // The Repeater injects 'modelData' directly into the item.
-            
-            windowWidth: notificationWindow.width
-            bodyMarkupSupported: notifServer.bodyMarkupSupported
         }
     }
 }

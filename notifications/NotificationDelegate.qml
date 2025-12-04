@@ -188,7 +188,7 @@ Rectangle {
                     height: 24
                     radius: 12
                     color: dismissArea.containsMouse ? Styles.primary_container : Styles.primary
-                    Behavior on color { Animations.FadeInFast {} }
+                    Behavior on color { ColorAnimation { duration: 150 } }
 
                     Text {
                         anchors.centerIn: parent
@@ -197,6 +197,7 @@ Rectangle {
                         font.family: Styles.mainFont
                         font.bold: true
                         color: dismissArea.containsMouse ? Styles.primary : Styles.primary_container
+                        Behavior on color { ColorAnimation { duration: 150 } }
                     }
 
                     MouseArea {
@@ -206,8 +207,6 @@ Rectangle {
                         cursorShape: Qt.PointingHandCursor
                         onClicked: dismissAnimation.start();
                     }
-
-                    Behavior on color { ColorAnimation { duration: 150 } }
                 }
             }
         }

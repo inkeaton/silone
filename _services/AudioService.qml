@@ -9,22 +9,27 @@ import "." as Services
 Singleton {
     id: root
 
-    // Keep PipeWire nodes tracked so bindings update as soon as volume changes.
-    property list<var> trackedObjects: {
-        const list = [];
-        if (Pipewire.defaultAudioSink)
-            list.push(Pipewire.defaultAudioSink);
-        const sinkAudio = Pipewire.defaultAudioSink?.audio;
-        if (sinkAudio)
-            list.push(sinkAudio);
-        return list;
-    }
-
+    // -------------------------------------------------------------------------
+    // PipeWire Object Tracking
+    // -------------------------------------------------------------------------
+    
+    // Track sink and its audio object so bindings update when volume changes
     PwObjectTracker {
         id: tracker
-        objects: root.trackedObjects
+        objects: {
+            const list = [];
+            if (Pipewire.defaultAudioSink)
+                list.push(Pipewire.defaultAudioSink);
+            if (Pipewire.defaultAudioSink?.audio)
+                list.push(Pipewire.defaultAudioSink.audio);
+            return list;
+        }
     }
 
+    // -------------------------------------------------------------------------
+    // Public Properties
+    // -------------------------------------------------------------------------
+    
     readonly property var sink: Pipewire.defaultAudioSink
     readonly property var sinkAudio: sink?.audio
     readonly property bool available: sinkAudio !== undefined
@@ -35,9 +40,13 @@ Singleton {
     readonly property real volume: root.available ? root.readVolume(sinkAudio) : 0.0
     readonly property bool muted: sinkAudio?.muted ?? false
 
-    // Expose current PipeWire nodes for per-app controls.
+    // Expose current PipeWire nodes for per-app controls
     readonly property var streams: Pipewire.nodes.values
 
+    // -------------------------------------------------------------------------
+    // Helper Functions
+    // -------------------------------------------------------------------------
+    
     function clampVolume(value) {
         return Math.max(0, Math.min(1, value));
     }
@@ -52,6 +61,10 @@ Singleton {
         return 0.0;
     }
 
+    // -------------------------------------------------------------------------
+    // Volume Control Functions
+    // -------------------------------------------------------------------------
+    
     function setVolume(value) {
         if (!root.available)
             return false;
@@ -81,6 +94,10 @@ Singleton {
         return true;
     }
 
+    // -------------------------------------------------------------------------
+    // Per-Node (App) Volume Control
+    // -------------------------------------------------------------------------
+    
     function nodeVolume(node) {
         if (!node?.audio)
             return 0.0;

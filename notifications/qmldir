@@ -1,0 +1,4 @@
+module notifications
+
+NotificationPanel NotificationPanel.qml
+NotificationDelegate NotificationDelegate.qml
