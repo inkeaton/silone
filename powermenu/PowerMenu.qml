@@ -14,14 +14,15 @@ import "../_utils"
 PanelWindow {
     id: powermenu
 
-    width: 350
-    height: 430
+    implicitWidth: 350
+    implicitHeight: 430
     color: "transparent"
     focusable: true
     visible: false
 
     // Process runner
     ProcessRunner { id: runner }
+    PowerOptionsModel { id: powerOptions }
 
     // Focus management
     onVisibleChanged: {
@@ -43,6 +44,7 @@ PanelWindow {
 
         ColumnLayout {
             anchors.fill: parent
+            anchors.margins: 10
             spacing: 0
 
                 // Header
@@ -89,28 +91,7 @@ PanelWindow {
                         cellHeight: Math.floor(width / columns)
 
                         // Data
-                        model: ListModel {
-                            ListElement {
-                                name: "Poweroff"
-                                icon: "../_styles/icons/pow/accensione.svg"
-                                command: "systemctl poweroff"
-                            }
-                            ListElement {
-                                name: "Reboot"
-                                icon: "../_styles/icons/pow/riavvio.svg"
-                                command: "systemctl reboot"
-                            }
-                            ListElement {
-                                name: "Lockscreen"
-                                icon: "../_styles/icons/pow/accensione.svg"
-                                command: "loginctl lock-session"
-                            }
-                            ListElement {
-                                name: "Logout"
-                                icon: "../_styles/icons/pow/accensione.svg"
-                                command: "hyprctl dispatch exit"
-                            }
-                        }
+                        model: powerOptions
 
                         // Highlight
                         highlight: Rectangle {
@@ -194,49 +175,15 @@ PanelWindow {
             width: optionGrid.cellWidth
             height: optionGrid.cellHeight
 
-            readonly property bool isCurrent: GridView.isCurrentItem
-            readonly property bool isHovered: mouseArea.containsMouse
-
-            scale: isCurrent ? 1.05 : (isHovered ? 1.02 : 1.0)
-            opacity: isCurrent ? 1.0 : (isHovered ? 0.9 : 0.7)
-
-            Behavior on scale { Animations.ScalePress {} }
-
-            Behavior on opacity { Animations.FadeInFast {} }
-
-            MouseArea {
-                id: mouseArea
+            PowerActionButton {
                 anchors.fill: parent
-                hoverEnabled: true
-                cursorShape: Qt.PointingHandCursor
-
-                onClicked: {
-                    if (model.command && model.command.length > 0) {
-                        executeCommand(model.command);
-                    }
-                }
-
-                Rectangle {
-                    color: "transparent"
-                    radius: 50
-
-                    anchors {
-                        fill: parent
-                        margins: optionGrid.spacing / 2
-                    }
-
-                    VectorImage {
-                        id: optionIcon
-                        source: model.icon
-                        width: 100
-                        height: 100
-                        fillMode: Image.PreserveAspectFit
-                        preferredRendererType: VectorImage.CurveRenderer
-                        anchors.centerIn: parent
-
-                        Accessible.role: Accessible.Button
-                        Accessible.name: model.name || "Power option"
-                        Accessible.description: model.command || ""
+                iconSource: model.icon
+                command: model.command
+                current: GridView.isCurrentItem
+                accessibleName: model.name || "Power option"
+                onTriggered: (cmd) => {
+                    if (cmd && cmd.length > 0) {
+                        executeCommand(cmd);
                     }
                 }
             }

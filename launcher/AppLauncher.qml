@@ -129,15 +129,46 @@ PanelWindow {
                         keyNavigationWraps: true
                         cacheBuffer: 500
 
+                        property int previousIndex: -1
+                        property bool skipWrapAnimation: false
+
                         model: appListModel
 
                         highlight: Rectangle {
                             color: Styles.surface
                             radius: 50
-                            Behavior on x { Animations.FadeInFast {} }
-                            Behavior on y { Animations.FadeInFast {} }
                         }
                         highlightFollowsCurrentItem: true
+                        highlightMoveDuration: skipWrapAnimation ? 0 : 150
+                        highlightResizeDuration: skipWrapAnimation ? 0 : 120
+
+                        onCurrentIndexChanged: {
+                            const count = appListModel.count;
+                            if (count <= 1) {
+                                previousIndex = currentIndex;
+                                skipWrapAnimation = false;
+                                return;
+                            }
+
+                            if (previousIndex === -1) {
+                                previousIndex = currentIndex;
+                                skipWrapAnimation = false;
+                                return;
+                            }
+
+                            const lastIndex = count - 1;
+                            const wrapped = (previousIndex === 0 && currentIndex === lastIndex)
+                                || (previousIndex === lastIndex && currentIndex === 0);
+
+                            if (wrapped) {
+                                skipWrapAnimation = true;
+                                Qt.callLater(() => skipWrapAnimation = false);
+                            } else {
+                                skipWrapAnimation = false;
+                            }
+
+                            previousIndex = currentIndex;
+                        }
 
                         delegate: Item {
                             id: delegateRoot
@@ -262,7 +293,7 @@ PanelWindow {
         appListModel.clear()
         
         // Limit results to improve performance (optional)
-        const maxResults = 50
+        const maxResults = 100
         const limitedResults = results.slice(0, maxResults)
         
         for (let i = 0; i < limitedResults.length; i++) {
