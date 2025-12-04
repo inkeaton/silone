@@ -1,6 +1,8 @@
 import QtQuick
 import QtQuick.Layouts
 import "../_styles/"
+import "../_services"
+import "../_components/animations" as Animations
 
 Rectangle {
     id: notifDelegate
@@ -75,7 +77,7 @@ Rectangle {
     ParallelAnimation {
         id: slideInAnimation
         NumberAnimation { target: slideTransform; property: "x"; to: 0; duration: 300; easing.type: Easing.OutCubic }
-        NumberAnimation { target: notifDelegate; property: "opacity"; to: 1; duration: 300; easing.type: Easing.OutCubic }
+        Animations.FadeInFast { target: notifDelegate; property: "opacity"; to: 1 }
     }
 
     SequentialAnimation {
@@ -83,7 +85,7 @@ Rectangle {
         
         ParallelAnimation {
             NumberAnimation { target: slideTransform; property: "x"; to: 400; duration: 250; easing.type: Easing.InCubic }
-            NumberAnimation { target: notifDelegate; property: "opacity"; to: 0; duration: 250; easing.type: Easing.InCubic }
+            Animations.FadeOutFast { target: notifDelegate; property: "opacity"; to: 0 }
         }
 
         ScriptAction {
@@ -116,17 +118,20 @@ Rectangle {
             spacing: 10
 
             // App Icon
-            Image {
+                Image {
                 id: notifIcon
                 Layout.preferredWidth: 32
                 Layout.preferredHeight: 32
                 
+                readonly property string fallbackIcon: Icons.notificationIcon(notification?.summary, notification?.urgency)
+
                 // Safe source lookups
                 source: (notification?.image) ? notification.image : 
-                        (notification?.appIcon) ? notification.appIcon : ""
+                    (notification?.appIcon) ? notification.appIcon : 
+                    (fallbackIcon.length > 0 ? fallbackIcon : "")
                 
                 // Explicit boolean check for visibility
-                visible: source.toString().length > 0
+                visible: !!source && source.toString().length > 0
                 
                 fillMode: Image.PreserveAspectFit
                 asynchronous: true
@@ -183,6 +188,7 @@ Rectangle {
                     height: 24
                     radius: 12
                     color: dismissArea.containsMouse ? Styles.primary_container : Styles.primary
+                    Behavior on color { Animations.FadeInFast {} }
 
                     Text {
                         anchors.centerIn: parent

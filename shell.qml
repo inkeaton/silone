@@ -5,6 +5,7 @@ import "./powermenu"
 import "./osd"
 import "./notifications"
 import "./dashboard"
+import "./_utils"
 
 // shell.qml
 import Quickshell
@@ -23,12 +24,22 @@ Scope {
         source: "./launcher/AppLauncher.qml"
     }
 
+    LoaderToggle {
+        id: launcherToggle
+        loader: launcherLoader
+    }
+
     // PowerMenu
     LazyLoader {
         id: powermenuLoader
         loading: true
 
         source: "./powermenu/PowerMenu.qml"
+    }
+
+    LoaderToggle {
+        id: powermenuToggle
+        loader: powermenuLoader
     }
 
     LazyLoader {
@@ -45,6 +56,11 @@ Scope {
         source: "./dashboard/ControlCenter.qml"
     }
 
+    LoaderToggle {
+        id: dashboardToggle
+        loader: dashboardLoader
+    }
+
     VolumeOSD {}
 
 // Toggles  
@@ -53,28 +69,15 @@ Scope {
         target: "toggle"  
 
         function launcher(){
-            if (!launcherLoader.item)
-                launcherLoader.active = true;
-
-            // toggle visibility
-            launcherLoader.item.visible = !launcherLoader.item.visible;
-            
+            launcherToggle.toggle();
         }
 
         function powermenu(){
-            if (!powermenuLoader.item)
-                powermenuLoader.active = true;
-
-            // toggle visibility
-            powermenuLoader.item.visible = !powermenuLoader.item.visible;
-            
+            powermenuToggle.toggle();
         }
 
         function dashboard() {
-            if (!dashboardLoader.item) 
-                dashboardLoader.active = true;
-
-            dashboardLoader.item.visible = !dashboardLoader.item.visible;
+            dashboardToggle.toggle();
         }
 
     }

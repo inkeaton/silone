@@ -2,8 +2,8 @@ import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls
 import Quickshell
-import Quickshell.Services.Pipewire
 import "../_styles"
+import "../_services"
 
 PanelWindow {
     id: dashboard
@@ -21,11 +21,6 @@ PanelWindow {
         if (visible) contentGrid.forceActiveFocus();
     }
 
-    // TRACKING: Essential for signals to fire, even if we read the Singleton below.
-    PwObjectTracker {
-        objects: [ Pipewire.defaultAudioSink ]
-    }
-
     Rectangle {
         id: mainRect
         width: parent.width
@@ -35,16 +30,7 @@ PanelWindow {
         clip: true
 
         property bool mixerExpanded: false
-            // Human-friendly device name (matches VolumeOSD logic)
-            readonly property string deviceName: {
-                const props = Pipewire.defaultAudioSink?.properties ?? {};
-                const desc = Pipewire.defaultAudioSink?.description ?? "";
-                return props["device.description"] 
-                    ?? props["node.description"] 
-                    ?? props["alsa.card.name"] 
-                    ?? desc 
-                    ?? "Unknown output";
-            }
+        readonly property string deviceName: AudioService.deviceName
 
         Behavior on implicitHeight {
             NumberAnimation {
@@ -110,7 +96,7 @@ PanelWindow {
                     Behavior on color { ColorAnimation { duration: 150 } }
                     
                     // Access Singleton directly
-                    readonly property bool isMuted: Pipewire.defaultAudioSink?.audio?.muted ?? false
+                    readonly property bool isMuted: AudioService.muted
                     
                     Text {
                         anchors.centerIn: parent
@@ -124,11 +110,7 @@ PanelWindow {
                         anchors.fill: parent
                         hoverEnabled: true
                         cursorShape: Qt.PointingHandCursor
-                        onClicked: {
-                            if (Pipewire.defaultAudioSink?.audio) {
-                                Pipewire.defaultAudioSink.audio.muted = !Pipewire.defaultAudioSink.audio.muted;
-                            }
-                        }
+                        onClicked: AudioService.toggleMute()
                     }
                 }
 
@@ -153,24 +135,11 @@ PanelWindow {
                         from: 0.0
                         to: 1.0
 
-                        // 1. READ LOGIC (Matches VolumeOSD)
-                        readonly property real systemVolume: {
-                            const audio = Pipewire.defaultAudioSink?.audio;
-                            if (!audio) return 0.5;
-                            if (audio.volume !== undefined) return audio.volume;
-                            if (audio.volumes !== undefined && audio.volumes.length > 0) return audio.volumes[0];
-                            return 0.5;
-                        }
-
                         // Prevent binding loop: while pressing, keep the local slider value.
-                        value: pressed ? value : systemVolume
+                        value: pressed ? value : AudioService.volume
 
                         // Write changes as the user drags (matches MixerEntry pattern).
-                        onMoved: {
-                            if (Pipewire.defaultAudioSink?.audio) {
-                                Pipewire.defaultAudioSink.audio.volume = value;
-                            }
-                        }
+                        onMoved: AudioService.setVolume(value)
 
                         // Visual Style
                         background: Rectangle {
@@ -195,14 +164,14 @@ PanelWindow {
                                     const w = parent.width;
                                     var frac = Math.max(0, Math.min(1, mouse.x / w));
                                     masterSlider.value = frac;
-                                    if (Pipewire.defaultAudioSink?.audio) Pipewire.defaultAudioSink.audio.volume = frac;
+                                    AudioService.setVolume(frac);
                                 }
                                 onPositionChanged: {
                                     if (pressed) {
                                         const w = parent.width;
                                         var frac = Math.max(0, Math.min(1, mouse.x / w));
                                         masterSlider.value = frac;
-                                        if (Pipewire.defaultAudioSink?.audio) Pipewire.defaultAudioSink.audio.volume = frac;
+                                        AudioService.setVolume(frac);
                                     }
                                 }
                             }
@@ -265,7 +234,7 @@ PanelWindow {
                 }
 
                 Repeater {
-                    model: Pipewire.nodes.values
+                    model: AudioService.streams
                     delegate: Item {
                         id: appWrapper
                         Layout.fillWidth: true
@@ -308,9 +277,7 @@ PanelWindow {
                 event.accepted = true;
                 break;
             case Qt.Key_Space:
-                if (Pipewire.defaultAudioSink?.audio) {
-                    Pipewire.defaultAudioSink.audio.muted = !Pipewire.defaultAudioSink.audio.muted;
-                }
+                AudioService.toggleMute()
                 event.accepted = true;
                 break;
             case Qt.Key_M:

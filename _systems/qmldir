@@ -1,6 +1,0 @@
-module _systems
-
-singleton Time Time.qml
-
-Corners Corners.qml
-Tray Tray.qml

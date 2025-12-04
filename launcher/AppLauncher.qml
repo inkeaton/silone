@@ -6,6 +6,8 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import QtQml.Models
 import "../_styles"
+import "../_components"
+import "../_components/animations" as Animations
 import "fuzzySearch.js" as FuzzySearch
 
 PanelWindow {
@@ -24,32 +26,23 @@ PanelWindow {
         }
     }
 
-    WrapperRectangle {
-        id: wrapTrasp
-        color: Styles.surface
+    PanelFrame {
+        id: panelFrame
         anchors.fill: parent
-        radius: 50
+        outerColor: Styles.surface
+        innerColor: Styles.primary_container
+        outerRadius: 50
+        innerRadius: 30
+        frameMargin: 20
 
-        WrapperRectangle {
-            id: wrap
-            color: Styles.primary_container
-            radius: 30
-            clip: true
-
+        ColumnLayout {
+            anchors.fill: parent
+            spacing: 10
             anchors {
-                fill: parent
-                margins: 20
+                leftMargin: 25
+                rightMargin: 25
+                topMargin: 16
             }
-
-            ColumnLayout {
-                anchors.fill: parent
-                spacing: 10
-
-                anchors {
-                    leftMargin: 25
-                    rightMargin: 25
-                    topMargin: 16
-                }
 
                 // Search field
                 TextField {
@@ -141,9 +134,10 @@ PanelWindow {
                         highlight: Rectangle {
                             color: Styles.surface
                             radius: 50
+                            Behavior on x { Animations.FadeInFast {} }
+                            Behavior on y { Animations.FadeInFast {} }
                         }
                         highlightFollowsCurrentItem: true
-                        highlightMoveDuration: 100
 
                         delegate: Item {
                             id: delegateRoot
@@ -244,7 +238,6 @@ PanelWindow {
                         }
                     }
                 }
-            }
         }
     }
 

@@ -1,7 +1,5 @@
 // PowerMenu.qml - Refactored with better process management
 import Quickshell
-import Quickshell.Io
-import Quickshell.Widgets
 import QtQuick
 import QtQuick.Window
 import QtQuick.Controls
@@ -9,6 +7,9 @@ import QtQml.Models
 import QtQuick.Layouts
 import QtQuick.VectorImage
 import "../_styles"
+import "../_components"
+import "../_components/animations" as Animations
+import "../_utils"
 
 PanelWindow {
     id: powermenu
@@ -20,10 +21,7 @@ PanelWindow {
     visible: false
 
     // Process runner
-    Process {
-        id: runner
-        running: false
-    }
+    ProcessRunner { id: runner }
 
     // Focus management
     onVisibleChanged: {
@@ -34,27 +32,18 @@ PanelWindow {
     }
 
     // Outer wrapper
-    WrapperRectangle {
-        id: wrapTrasp
-        color: Styles.surface
+    PanelFrame {
+        id: panelFrame
         anchors.fill: parent
-        radius: 50
+        outerColor: Styles.surface
+        innerColor: Styles.primary_container
+        outerRadius: 50
+        innerRadius: 30
+        frameMargin: 20
 
-        // Inner wrapper
-        WrapperRectangle {
-            id: wrap
-            color: Styles.primary_container
-            radius: 30
-            clip: true
-
-            anchors {
-                fill: parent
-                margins: 20
-            }
-
-            ColumnLayout {
-                anchors.fill: parent
-                spacing: 0
+        ColumnLayout {
+            anchors.fill: parent
+            spacing: 0
 
                 // Header
                 Rectangle {
@@ -192,7 +181,6 @@ PanelWindow {
                         }
                     }
                 }
-            }
         }
     }
 
@@ -212,19 +200,9 @@ PanelWindow {
             scale: isCurrent ? 1.05 : (isHovered ? 1.02 : 1.0)
             opacity: isCurrent ? 1.0 : (isHovered ? 0.9 : 0.7)
 
-            Behavior on scale {
-                NumberAnimation {
-                    duration: 170
-                    easing.type: Easing.OutCubic
-                }
-            }
+            Behavior on scale { Animations.ScalePress {} }
 
-            Behavior on opacity {
-                NumberAnimation {
-                    duration: 170
-                    easing.type: Easing.OutCubic
-                }
-            }
+            Behavior on opacity { Animations.FadeInFast {} }
 
             MouseArea {
                 id: mouseArea
@@ -269,9 +247,7 @@ PanelWindow {
     function executeCommand(command) {
         if (!command || command.length === 0) return;
 
-        const cmdArray = command.split(" ");
-        runner.command = cmdArray;
-        runner.running = true;
-        powermenu.visible = false;
+        if (runner.run(command))
+            powermenu.visible = false;
     }
 }

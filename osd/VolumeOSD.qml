@@ -2,22 +2,17 @@
 import QtQuick
 import QtQuick.Layouts
 import Quickshell
-import Quickshell.Services.Pipewire
 import Quickshell.Widgets
 import QtQuick.VectorImage
 import "../_styles"
+import "../_services"
 
 Scope {
     id: root
 
-    // Track the default audio sink
-    PwObjectTracker {
-        objects: [ Pipewire.defaultAudioSink ]
-    }
-
-    // Show OSD when volume or mute changes
+    // Show the panel whenever AudioService reports a change.
     Connections {
-        target: Pipewire.defaultAudioSink?.audio
+        target: AudioService
 
         function onVolumeChanged() {
             root.shouldShowOsd = true;
@@ -37,48 +32,15 @@ Scope {
     property bool panelActive: false
 
     // Current volume (0.0 to 1.0)
-    property real volumeValue: {
-        const audio = Pipewire.defaultAudioSink?.audio;
-        if (!audio) return 0;
-        
-        // Support both single volume and volume array
-        if (audio.volume !== undefined) return audio.volume;
-        if (audio.volumes !== undefined && audio.volumes.length > 0) return audio.volumes[0];
-        return 0;
-    }
+    property real volumeValue: AudioService.volume
 
     // Mute state
-    property bool isMuted: Pipewire.defaultAudioSink?.audio?.muted ?? false
+    property bool isMuted: AudioService.muted
 
     // Device information
-    property string deviceName: {
-        const props = Pipewire.defaultAudioSink?.properties ?? {};
-        const desc = Pipewire.defaultAudioSink?.description ?? "";
-        
-        return props["device.description"] 
-            ?? props["node.description"] 
-            ?? props["alsa.card.name"] 
-            ?? desc 
-            ?? "Unknown output";
-    }
+    property string deviceName: AudioService.deviceName
 
-    property string deviceIconName: {
-        const props = Pipewire.defaultAudioSink?.properties ?? {};
-        const name = (props["device.description"] 
-                   ?? props["node.description"] 
-                   ?? Pipewire.defaultAudioSink?.description 
-                   ?? "").toLowerCase();
-
-        // Detect device type from name
-        if (name.includes("headphone") || name.includes("headset")) {
-            return "../_styles/icons/vol/volume-100.svg";
-        }
-        if (name.includes("speaker") || name.includes("speakers")) {
-            return "../_styles/icons/vol/volume-75.svg";
-        }
-
-        return "../_styles/icons/vol/volume-25.svg";
-    }
+    property string deviceIconName: AudioService.deviceIcon
 
     // Hide timer
     Timer {

@@ -1,6 +1,6 @@
 // Clock.qml
 import QtQuick
-import "../../_systems"
+import "../../_services"
 import "../../_styles"
 
 Rectangle {

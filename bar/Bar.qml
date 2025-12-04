@@ -6,7 +6,8 @@ import Quickshell
 import Quickshell.Hyprland
 import "./modules" // bar components
 import "../_styles/"
-import "../_systems/"
+import "../_services"
+import "../_components"
 
 Scope {
     Variants {

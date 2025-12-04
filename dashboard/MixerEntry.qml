@@ -5,6 +5,7 @@ import QtQuick.Controls
 import Quickshell
 import Quickshell.Services.Pipewire
 import "../_styles"
+import "../_services"
 
 ColumnLayout {
     id: root
@@ -26,22 +27,7 @@ ColumnLayout {
         // App name with smart fallback
         Text {
             Layout.fillWidth: true
-            text: {
-                if (!root.node || !root.node.properties) return "Unknown";
-                
-                const props = root.node.properties;
-                const appName = props["application.name"] ?? root.node.description ?? "Unknown App";
-                const mediaName = props["media.name"];
-                
-                // Use media name if it's meaningful and different from app name
-                if (mediaName && 
-                    mediaName !== appName && 
-                    mediaName.indexOf("Audio Stream") === -1) {
-                    return mediaName;
-                }
-                
-                return appName;
-            }
+            text: AudioService.nodeDisplayName(root.node)
             
             color: Styles.primary
             font.family: Styles.mainFont
@@ -79,11 +65,7 @@ ColumnLayout {
                 hoverEnabled: true
                 cursorShape: Qt.PointingHandCursor
                 
-                onClicked: {
-                    if (root.node && root.node.audio) {
-                        root.node.audio.muted = !root.node.audio.muted;
-                    }
-                }
+                onClicked: AudioService.toggleNodeMute(root.node)
             }
         }
     }
@@ -100,13 +82,9 @@ ColumnLayout {
         to: 1.0
         
         // Prevent binding loop: use internal value when dragging
-        value: pressed ? value : (root.node?.audio?.volume ?? 0.0)
+        value: pressed ? value : AudioService.nodeVolume(root.node)
         
-        onMoved: {
-            if (root.node && root.node.audio) {
-                root.node.audio.volume = value;
-            }
-        }
+        onMoved: AudioService.setNodeVolume(root.node, value)
 
         background: Rectangle {
             x: volumeSlider.leftPadding

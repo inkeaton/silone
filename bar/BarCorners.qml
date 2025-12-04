@@ -1,7 +1,7 @@
 import Quickshell
 import Quickshell.Io
 import QtQuick
-import "../_systems"
+import "../_components"
 import "../_styles"
 
 PanelWindow {
