@@ -1,0 +1,12 @@
+module Config
+
+singleton Config 1.0 Config.qml
+
+AppearanceConfig 1.0 AppearanceConfig.qml
+BarConfig 1.0 BarConfig.qml
+NotificationsConfig 1.0 NotificationsConfig.qml
+OsdConfig 1.0 OsdConfig.qml
+LauncherConfig 1.0 LauncherConfig.qml
+PowerMenuConfig 1.0 PowerMenuConfig.qml
+DashboardConfig 1.0 DashboardConfig.qml
+GeneralConfig 1.0 GeneralConfig.qml

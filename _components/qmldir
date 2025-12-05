@@ -1,5 +1,6 @@
 module _components
 PanelFrame PanelFrame.qml
+ClickOutsideCatcher ClickOutsideCatcher.qml
 Corners Corners.qml
 Tray Tray.qml
 animations/FadeInFast animations/FadeInFast.qml

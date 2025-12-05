@@ -1,5 +1,6 @@
 // AppLauncher.qml - Refactored with improvements
 import Quickshell
+import Quickshell.Wayland
 import Quickshell.Widgets
 import QtQuick
 import QtQuick.Controls
@@ -8,15 +9,19 @@ import QtQml.Models
 import "../_styles"
 import "../_components"
 import "../_components/animations" as Animations
+import "../_config"
 import "fuzzySearch.js" as FuzzySearch
 
 PanelWindow {
     id: launcher
-    implicitWidth: 600
-    implicitHeight: 380
+    implicitWidth: Config.launcher.width
+    implicitHeight: Config.launcher.height
     color: "transparent"
     focusable: true
     visible: false
+    
+    // Overlay layer to appear above scrim
+    WlrLayershell.layer: WlrLayer.Overlay
 
     onVisibleChanged: {
         if (visible) {
@@ -110,7 +115,7 @@ PanelWindow {
                 // Debounce timer for search
                 Timer {
                     id: searchDebounceTimer
-                    interval: 100
+                    interval: Config.launcher.searchDebounceMs
                     repeat: false
                     onTriggered: updateAppList()
                 }
@@ -221,31 +226,33 @@ PanelWindow {
                     }
 
                     // Empty state
-                    ColumnLayout {
-                        anchors.centerIn: parent
-                        spacing: 10
-                        implicitWidth: parent.width - 40
+                    Item {
+                        // Wrapper needed because StackLayout manages children
+                        ColumnLayout {
+                            anchors.centerIn: parent
+                            spacing: 10
+                            width: parent.width - 40
 
-                        Text {
-                            Layout.alignment: Qt.AlignHCenter
-                            text: "🔍"
-                            font.pixelSize: 90
-                            color: Styles.primary
-                            opacity: 0.5
-                        }
+                            Text {
+                                Layout.alignment: Qt.AlignHCenter
+                                text: "🔍"
+                                font.pixelSize: 90
+                                color: Styles.primary
+                                opacity: 0.5
+                            }
 
-                        Text {
-                            Layout.alignment: Qt.AlignHCenter
-                            text: search.text.length > 0
-                                ? "Nessuna applicazione trovata"
-                                : "Inizia a digitare per cercare"
-                            color: Styles.primary
-                            opacity: 0.7
+                            Text {
+                                Layout.alignment: Qt.AlignHCenter
+                                text: search.text.length > 0
+                                    ? "Nessuna applicazione trovata"
+                                    : "Inizia a digitare per cercare"
+                                color: Styles.primary
+                                opacity: 0.7
 
-                            font: Qt.font({
-                                pixelSize: 25,
-                                family: Styles.mainFont
-                            })
+                                font: Qt.font({
+                                    pixelSize: 25,
+                                    family: Styles.mainFont
+                                })
 
                             horizontalAlignment: Text.AlignHCenter
                         }
@@ -268,6 +275,7 @@ PanelWindow {
                             wrapMode: Text.WordWrap
                         }
                     }
+                    }  // Close Item wrapper
                 }
         }
     }

@@ -5,6 +5,7 @@ import QtQuick
 import QtQuick.Layouts
 import "../_styles/"
 import "../_services"
+import "../_config"
 
 Scope {
     id: root
@@ -21,12 +22,12 @@ Scope {
         }
 
         margins {
-            top: 10  // Below bar
-            right: 10
+            top: Config.notifications.topMargin
+            right: Config.notifications.rightMargin
         }
         
         // Use implicitWidth instead of deprecated width
-        implicitWidth: 350
+        implicitWidth: Config.notifications.panelWidth
         
         // Dynamic height based on content
         implicitHeight: NotificationService.hasNotifications 
@@ -46,7 +47,7 @@ Scope {
                 left: parent.left
                 right: parent.right
             }
-            spacing: 8
+            spacing: Config.notifications.spacing
             
             Repeater {
                 model: NotificationService.trackedNotifications

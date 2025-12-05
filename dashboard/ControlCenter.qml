@@ -2,31 +2,50 @@ import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls
 import Quickshell
+import Quickshell.Wayland
 import "../_styles"
 import "../_services"
+import "../_config"
 
 PanelWindow {
     id: dashboard
 
     anchors { top: true; left: true }
-    margins { top: 10; left: 10 }
+    margins { top: Config.dashboard.topMargin; left: Config.dashboard.rightMargin }
 
-    width: 400
-    height: mainRect.implicitHeight
+    implicitWidth: Config.dashboard.width
+    implicitHeight: mainRect.implicitHeight
     
     visible: false
     color: "transparent"
+    
+    // Overlay layer to appear above scrim
+    WlrLayershell.layer: WlrLayer.Overlay
 
     onVisibleChanged: {
-        if (visible) contentGrid.forceActiveFocus();
+        if (visible) focusScope.forceActiveFocus();
+    }
+
+    // FocusScope to handle keyboard input
+    FocusScope {
+        id: focusScope
+        anchors.fill: parent
+        focus: true
+        
+        Keys.onPressed: (event) => {
+            if (event.key === Qt.Key_Escape) {
+                dashboard.visible = false;
+                event.accepted = true;
+            }
+        }
     }
 
     Rectangle {
         id: mainRect
-        width: parent.width
+        anchors.fill: parent
         implicitHeight: mainLayout.implicitHeight + 40
         color: Styles.surface
-        radius: 30
+        radius: Config.appearance.rounding.large
         clip: true
 
         property bool mixerExpanded: false
@@ -87,7 +106,6 @@ PanelWindow {
                 id: contentGrid
                 Layout.fillWidth: true
                 spacing: 10
-                focus: true
 
                 // Mute Button
                 Rectangle {

@@ -6,6 +6,7 @@ import Quickshell.Widgets
 import QtQuick.VectorImage
 import "../_styles"
 import "../_services"
+import "../_config"
 
 Scope {
     id: root
@@ -45,7 +46,7 @@ Scope {
     // Hide timer
     Timer {
         id: hideTimer
-        interval: 1000
+        interval: Config.osd.hideDelay
         onTriggered: {
             root.shouldShowOsd = false;
         }

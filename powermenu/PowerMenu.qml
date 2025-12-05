@@ -1,5 +1,6 @@
 // PowerMenu.qml - Refactored with better process management
 import Quickshell
+import Quickshell.Wayland
 import QtQuick
 import QtQuick.Window
 import QtQuick.Controls
@@ -10,15 +11,19 @@ import "../_styles"
 import "../_components"
 import "../_components/animations" as Animations
 import "../_utils"
+import "../_config"
 
 PanelWindow {
     id: powermenu
 
-    implicitWidth: 350
-    implicitHeight: 430
+    implicitWidth: Config.powerMenu.width
+    implicitHeight: Config.powerMenu.height
     color: "transparent"
     focusable: true
     visible: false
+    
+    // Overlay layer to appear above scrim
+    WlrLayershell.layer: WlrLayer.Overlay
 
     // Process runner
     ProcessRunner { id: runner }

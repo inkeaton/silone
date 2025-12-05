@@ -77,7 +77,7 @@ Item {
             
             RowLayout {
                 id: container
-                anchors.fill: parent
+                anchors.verticalCenter: parent.verticalCenter
                 spacing: 8
             }
         }

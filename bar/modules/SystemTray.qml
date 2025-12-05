@@ -11,7 +11,8 @@ RowLayout {
     id: trayRow
     spacing: 8
 
-    anchors.centerIn: parent
+    // Use Layout.alignment instead of anchors when inside a layout
+    Layout.alignment: Qt.AlignCenter
 
     Repeater {
         model: SystemTray.items

@@ -9,19 +9,49 @@ Item {
     visible: false
 
     property alias running: process.running
+    
+    // Signals for command completion
+    signal finished(int exitCode, string stdout, string stderr)
+    signal failed(string error)
 
     Process {
         id: process
         running: false
+        
+        stdout: SplitParser {
+            onRead: data => stdoutBuffer += data
+        }
+        
+        stderr: SplitParser {
+            onRead: data => stderrBuffer += data
+        }
+        
+        onExited: (code, status) => {
+            if (status === Process.Error) {
+                root.failed("Process failed to start")
+            } else {
+                root.finished(code, stdoutBuffer, stderrBuffer)
+            }
+            stdoutBuffer = ""
+            stderrBuffer = ""
+        }
     }
+    
+    property string stdoutBuffer: ""
+    property string stderrBuffer: ""
 
     function run(command, options) {
         const normalized = normalizeCommand(command)
         if (!normalized) {
             console.warn("ProcessRunner: invalid command", command)
+            failed("Invalid command: " + command)
             return false
         }
 
+        // Reset buffers
+        stdoutBuffer = ""
+        stderrBuffer = ""
+        
         process.command = normalized
         const opts = options || {}
         if (opts.cwd !== undefined)

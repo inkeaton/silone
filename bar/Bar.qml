@@ -8,6 +8,7 @@ import "./modules" // bar components
 import "../_styles/"
 import "../_services"
 import "../_components"
+import "../_config"
 
 Scope {
     Variants {
@@ -19,7 +20,7 @@ Scope {
 
             required property var modelData
 
-            implicitHeight: 40
+            implicitHeight: Config.bar.height
             screen: modelData
 
             anchors {

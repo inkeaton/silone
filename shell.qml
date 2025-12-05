@@ -7,6 +7,8 @@ import "./notifications"
 import "./dashboard"
 import "./_utils"
 import "./_services"
+import "./_config"
+import "./_components"
 
 // shell.qml - Main shell entry point
 import Quickshell
@@ -27,8 +29,13 @@ Scope {
     NotificationPanel {}
 
     // -------------------------------------------------------------------------
-    // Launcher (lazy-loaded popup)
+    // Launcher (lazy-loaded popup with click-outside-to-close)
     // -------------------------------------------------------------------------
+    ClickOutsideCatcher {
+        popup: launcherLoader.item
+        scrimOpacity: 0.4
+    }
+    
     LazyLoader {
         id: launcherLoader
         loading: true
@@ -41,8 +48,13 @@ Scope {
     }
 
     // -------------------------------------------------------------------------
-    // PowerMenu (lazy-loaded popup)
+    // PowerMenu (lazy-loaded popup with click-outside-to-close)
     // -------------------------------------------------------------------------
+    ClickOutsideCatcher {
+        popup: powermenuLoader.item
+        scrimOpacity: 0.5
+    }
+    
     LazyLoader {
         id: powermenuLoader
         loading: true
@@ -55,8 +67,13 @@ Scope {
     }
 
     // -------------------------------------------------------------------------
-    // Dashboard / Control Center (lazy-loaded popup)
+    // Dashboard / Control Center (lazy-loaded popup with click-outside-to-close)
     // -------------------------------------------------------------------------
+    ClickOutsideCatcher {
+        popup: dashboardLoader.item
+        scrimOpacity: 0.3
+    }
+    
     LazyLoader {
         id: dashboardLoader
         loading: true

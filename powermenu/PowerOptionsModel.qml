@@ -1,25 +1,31 @@
-import QtQml.Models
+import QtQuick
+import "../_config"
 
 // Centralized list of power actions used by PowerMenu
+// Uses Config for commands so they can be customized
 ListModel {
-    ListElement {
-        name: "Poweroff"
-        icon: "../_styles/icons/pow/accensione.svg"
-        command: "systemctl poweroff"
-    }
-    ListElement {
-        name: "Reboot"
-        icon: "../_styles/icons/pow/riavvio.svg"
-        command: "systemctl reboot"
-    }
-    ListElement {
-        name: "Lockscreen"
-        icon: "../_styles/icons/pow/accensione.svg"
-        command: "loginctl lock-session"
-    }
-    ListElement {
-        name: "Logout"
-        icon: "../_styles/icons/pow/accensione.svg"
-        command: "hyprctl dispatch exit"
+    id: powerOptionsModel
+    
+    Component.onCompleted: {
+        append({
+            name: "Poweroff",
+            icon: Config.powerMenu.icons.poweroff,
+            command: Config.powerMenu.commands.poweroff
+        });
+        append({
+            name: "Reboot",
+            icon: Config.powerMenu.icons.reboot,
+            command: Config.powerMenu.commands.reboot
+        });
+        append({
+            name: "Lockscreen",
+            icon: Config.powerMenu.icons.lock,
+            command: Config.powerMenu.commands.lock
+        });
+        append({
+            name: "Logout",
+            icon: Config.powerMenu.icons.logout,
+            command: Config.powerMenu.commands.logout
+        });
     }
 }

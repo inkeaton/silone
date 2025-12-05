@@ -3,6 +3,7 @@ pragma Singleton
 
 import Quickshell
 import QtQuick
+import "../_config"
 
 Singleton {
 	id: root
@@ -10,7 +11,7 @@ Singleton {
 	readonly property string time: {
 		// The passed format string matches the default output of
 		// the `date` command.
-		Qt.formatDateTime(clock.date, "hh:mm")
+		Qt.formatDateTime(clock.date, Config.bar.clockFormat)
 	}
 
 	SystemClock {
