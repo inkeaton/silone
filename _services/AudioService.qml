@@ -35,7 +35,6 @@ Singleton {
     readonly property bool available: sinkAudio !== undefined
 
     readonly property string deviceName: Services.Icons.deviceNameForSink(sink)
-    readonly property string deviceIcon: Services.Icons.deviceIconForSink(sink)
 
     readonly property real volume: root.available ? root.readVolume(sinkAudio) : 0.0
     readonly property bool muted: sinkAudio?.muted ?? false

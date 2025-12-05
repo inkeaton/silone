@@ -30,7 +30,7 @@ Rectangle {
     property real radiusOff: buttonHeight / 2  // Circle by default
     
     // Font settings
-    property int fontSize: 14
+    property int fontSize: 18
     property bool fontBold: true
     
     // Hover scale factor

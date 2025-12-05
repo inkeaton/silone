@@ -91,6 +91,12 @@ Scope {
     VolumeOSD {}
 
     // -------------------------------------------------------------------------
+    // Brightness OSD (always active, shows on brightness change)
+    // NOTE: UNTESTED - requires BrightnessService
+    // -------------------------------------------------------------------------
+    BrightnessOSD {}
+
+    // -------------------------------------------------------------------------
     // IPC Handlers for external toggle commands
     // Usage: qs ipc call toggle <function_name>
     // -------------------------------------------------------------------------

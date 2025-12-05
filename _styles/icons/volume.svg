@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="111.11905mm"
+   height="111.11905mm"
+   viewBox="0 0 111.11905 111.11905"
+   version="1.1"
+   id="svg1"
+   sodipodi:docname="volume_icon.svg"
+   inkscape:version="1.4.2 (ebf0e940d0, 2025-05-08)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm"
+     inkscape:zoom="1.7442901"
+     inkscape:cx="103.19384"
+     inkscape:cy="210.68743"
+     inkscape:window-width="2560"
+     inkscape:window-height="1388"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs1" />
+  <g
+     inkscape:label="Livello 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-49.440475,-92.940475)">
+    <path
+       d="m 104.99987,92.940475 a 55.559525,55.559525 0 0 0 -55.559395,55.559395 55.559525,55.559525 0 0 0 55.559395,55.5594 55.559525,55.559525 0 0 0 55.5594,-55.5594 55.559525,55.559525 0 0 0 -55.5594,-55.559395 z m 0,9.813355 a 15.991261,15.991261 0 0 1 15.99128,15.99127 15.991261,15.991261 0 0 1 -15.99128,15.99127 15.991261,15.991261 0 0 1 -15.991268,-15.99127 15.991261,15.991261 0 0 1 15.991268,-15.99127 z m 0,36.1456 a 29.666628,29.666628 0 0 1 29.66693,29.66692 29.666628,29.666628 0 0 1 -29.66693,29.66641 29.666628,29.666628 0 0 1 -29.666402,-29.66641 29.666628,29.666628 0 0 1 29.666402,-29.66692 z"
+       style="fill:#ffb2be;fill-rule:evenodd;stroke-width:0.264583"
+       id="path4" />
+    <g
+       id="g2"
+       transform="matrix(1.1544293,0,0,1.1544293,-16.215077,-29.127108)">
+      <circle
+         style="fill:#ffd9de;fill-opacity:1;fill-rule:evenodd;stroke-width:0.183391"
+         id="path2-3-1"
+         cx="105"
+         cy="171.24773"
+         r="15.240458" />
+    </g>
+    <g
+       id="g3"
+       transform="matrix(0.62227433,0,0,0.62227433,39.661195,12.181983)">
+      <circle
+         style="fill:#ffd9de;fill-opacity:1;fill-rule:evenodd;stroke-width:0.151243"
+         id="circle3"
+         cx="105"
+         cy="171.24773"
+         r="12.568813" />
+    </g>
+  </g>
+</svg>

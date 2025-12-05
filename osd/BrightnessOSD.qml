@@ -1,4 +1,5 @@
-// VolumeOSD.qml - Arc-style volume indicator
+// BrightnessOSD.qml - Arc-style brightness indicator
+// NOTE: UNTESTED - User cannot test right now
 import QtQuick
 import QtQuick.Layouts
 import Quickshell
@@ -11,21 +12,22 @@ import "../_config"
 Scope {
     id: root
 
-    // Show the panel whenever AudioService reports a change.
+    // Track previous brightness to detect changes
+    property real previousBrightness: BrightnessService.brightness
+
+    // Show the panel whenever BrightnessService reports a change
     Connections {
-        target: AudioService
+        target: BrightnessService
 
-        function onVolumeChanged() {
-            root.shouldShowOsd = true;
-            root.panelActive = true;
-            root.bounceTrigger++;
-            hideTimer.restart();
-        }
-
-        function onMutedChanged() {
-            root.shouldShowOsd = true;
-            root.panelActive = true;
-            hideTimer.restart();
+        function onBrightnessChanged() {
+            // Only show OSD if brightness actually changed significantly
+            if (Math.abs(BrightnessService.brightness - root.previousBrightness) > 0.001) {
+                root.previousBrightness = BrightnessService.brightness;
+                root.shouldShowOsd = true;
+                root.panelActive = true;
+                root.bounceTrigger++;
+                hideTimer.restart();
+            }
         }
     }
 
@@ -33,11 +35,8 @@ Scope {
     property bool shouldShowOsd: false
     property bool panelActive: false
 
-    // Current volume (0.0 to 1.0)
-    property real volumeValue: AudioService.volume
-
-    // Mute state
-    property bool isMuted: AudioService.muted
+    // Current brightness (0.0 to 1.0)
+    property real brightnessValue: BrightnessService.brightness
 
     // Hide timer
     Timer {
@@ -48,9 +47,9 @@ Scope {
         }
     }
 
-    // Animated volume value for smooth arc tweening
-    property real animatedVolume: volumeValue
-    Behavior on animatedVolume {
+    // Animated brightness value for smooth arc tweening
+    property real animatedBrightness: brightnessValue
+    Behavior on animatedBrightness {
         NumberAnimation {
             duration: 200
             easing.type: Easing.OutCubic
@@ -65,7 +64,7 @@ Scope {
         active: root.panelActive
 
         PanelWindow {
-            // Positioning
+            // Positioning (same as VolumeOSD)
             anchors.bottom: true
             margins.bottom: screen.height / 14
             exclusiveZone: 0
@@ -130,36 +129,33 @@ Scope {
                         Component.onCompleted: requestPaint()
                     }
 
-                    // Active volume arc
+                    // Active brightness arc
                     Canvas {
-                        id: volumeArc
+                        id: brightnessArc
                         anchors.fill: parent
 
-                        property real volume: root.animatedVolume
-                        onVolumeChanged: requestPaint()
-
-                        property bool muted: root.isMuted
-                        onMutedChanged: requestPaint()
+                        property real brightness: root.animatedBrightness
+                        onBrightnessChanged: requestPaint()
 
                         onPaint: {
                             var ctx = getContext("2d");
                             var centerX = width / 2;
                             var centerY = height / 2;
                             
-                            // Calculate end angle based on animated volume
-                            var volumeAngle = arcContainer.startAngle + 
-                                (arcContainer.totalSweep * root.animatedVolume);
+                            // Calculate end angle based on animated brightness
+                            var brightnessAngle = arcContainer.startAngle + 
+                                (arcContainer.totalSweep * root.animatedBrightness);
 
                             ctx.clearRect(0, 0, width, height);
                             
-                            if (root.animatedVolume > 0.01) {
+                            if (root.animatedBrightness > 0.01) {
                                 ctx.beginPath();
                                 ctx.arc(centerX, centerY, arcContainer.arcRadius,
-                                        arcContainer.startAngle, volumeAngle, false);
+                                        arcContainer.startAngle, brightnessAngle, false);
                                 ctx.lineWidth = arcContainer.arcWidth;
                                 ctx.lineCap = "round";
                                 ctx.strokeStyle = Styles.primary;
-                                ctx.globalAlpha = root.isMuted ? 0.4 : 1.0;
+                                ctx.globalAlpha = 1.0;
                                 ctx.stroke();
                             }
                         }
@@ -167,22 +163,17 @@ Scope {
                         Component.onCompleted: requestPaint()
                     }
 
-                    // Volume icon (centered)
+                    // Brightness icon (centered)
                     VectorImage {
-                        id: volumeIcon
+                        id: brightnessIcon
                         anchors.centerIn: parent
-                        source: "../_styles/icons/volume.svg"
+                        source: "../_styles/icons/brightness.svg"
                         width: 90
                         height: 90
                         fillMode: Image.PreserveAspectFit
                         preferredRendererType: VectorImage.CurveRenderer
                         
-                        opacity: root.isMuted ? 0.4 : 1.0
                         scale: 1.0
-
-                        Behavior on opacity {
-                            NumberAnimation { duration: 150 }
-                        }
 
                         // Watch for bounce trigger
                         Connections {
@@ -196,14 +187,14 @@ Scope {
                         SequentialAnimation {
                             id: iconBounceAnim
                             NumberAnimation {
-                                target: volumeIcon
+                                target: brightnessIcon
                                 property: "scale"
                                 to: 1.1
                                 duration: 80
                                 easing.type: Easing.OutQuad
                             }
                             NumberAnimation {
-                                target: volumeIcon
+                                target: brightnessIcon
                                 property: "scale"
                                 to: 1.0
                                 duration: 200
@@ -214,12 +205,12 @@ Scope {
                     }
                 }
 
-                // Volume label
+                // Brightness label
                 Text {
                     anchors.horizontalCenter: parent.horizontalCenter
                     anchors.bottom: parent.bottom
                     anchors.bottomMargin: 12
-                    text: "Volume"
+                    text: "Luminosità"
                     font.pixelSize: 16
                     font.family: Styles.mainFont
                     font.bold: true
