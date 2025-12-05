@@ -3,6 +3,7 @@ PanelFrame PanelFrame.qml
 ClickOutsideCatcher ClickOutsideCatcher.qml
 Corners Corners.qml
 Tray Tray.qml
+ToggleButton ToggleButton.qml
 animations/FadeInFast animations/FadeInFast.qml
 animations/FadeOutFast animations/FadeOutFast.qml
 animations/ScalePress animations/ScalePress.qml

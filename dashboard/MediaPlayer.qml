@@ -6,6 +6,7 @@ import QtQuick.Effects
 import Quickshell
 import Quickshell.Services.Mpris
 import "../_styles"
+import "../_components"
 
 Item {
     id: root
@@ -267,47 +268,38 @@ Item {
             }
 
             // Right side: Play/Pause button
-            Rectangle {
-                width: 56
-                height: 56
-                radius: 28
-                color: "white"
+            ToggleButton {
+                buttonWidth: 56
+                buttonHeight: 56
                 Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
-                scale: playMouse.containsMouse ? 1.05 : 1.0
                 
-                Behavior on scale {
-                    NumberAnimation { duration: 100 }
-                }
+                toggled: root.hasPlayer && root.player.playbackState === MprisPlaybackState.Playing
                 
-                MouseArea {
-                    id: playMouse
-                    anchors.fill: parent
-                    hoverEnabled: true
-                    cursorShape: Qt.PointingHandCursor
+                textOn: "⏸"
+                textOff: "▶"
+                fontSize: 24
+                
+                // White background, black text
+                colorOn: "white"
+                colorOff: "white"
+                textColor: "black"
+                
+                // Circle when paused, rounded rect when playing
+                radiusOn: 28
+                radiusOff: 16
+                
+                onClicked: {
+                    if (!root.hasPlayer) return;
                     
-                    onClicked: {
-                        if (!root.hasPlayer) return;
-                        
-                        if (root.player.canTogglePlaying) {
-                            root.player.togglePlaying();
+                    if (root.player.canTogglePlaying) {
+                        root.player.togglePlaying();
+                    } else {
+                        if (root.player.playbackState === MprisPlaybackState.Playing) {
+                            root.player.pause();
                         } else {
-                            if (root.player.playbackState === MprisPlaybackState.Playing) {
-                                root.player.pause();
-                            } else {
-                                root.player.play();
-                            }
+                            root.player.play();
                         }
                     }
-                }
-                
-                Text {
-                    anchors.centerIn: parent
-                    x: text === "▶" ? 2 : 0
-                    text: (root.hasPlayer && root.player.playbackState === MprisPlaybackState.Playing) 
-                        ? "⏸" 
-                        : "▶"
-                    color: "black"
-                    font.pixelSize: 24
                 }
             }
         }

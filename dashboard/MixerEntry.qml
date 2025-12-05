@@ -6,6 +6,7 @@ import Quickshell
 import Quickshell.Services.Pipewire
 import "../_styles"
 import "../_services"
+import "../_components"
 
 ColumnLayout {
     id: root
@@ -42,31 +43,26 @@ ColumnLayout {
         }
 
         // Mute toggle button
-        Rectangle {
-            width: 24
-            height: 24
-            radius: 12
-            color: muteMouse.containsMouse ? Styles.primary_container : "transparent"
+        ToggleButton {
+            buttonWidth: 24
+            buttonHeight: 24
             
-            Behavior on color {
-                ColorAnimation { duration: 150 }
-            }
+            toggled: root.node?.audio?.muted ?? false
             
-            Text {
-                anchors.centerIn: parent
-                text: root.node?.audio?.muted ? "🔇" : "🔊"
-                color: Styles.primary
-                font.pixelSize: 14
-            }
-
-            MouseArea {
-                id: muteMouse
-                anchors.fill: parent
-                hoverEnabled: true
-                cursorShape: Qt.PointingHandCursor
-                
-                onClicked: AudioService.toggleNodeMute(root.node)
-            }
+            textOn: "🔇"
+            textOff: "🔊"
+            fontSize: 14
+            
+            // Keep same color, transparent background
+            colorOn: "transparent"
+            colorOff: "transparent"
+            textColor: Styles.primary
+            
+            // Circle shape always
+            radiusOn: 12
+            radiusOff: 12
+            
+            onClicked: AudioService.toggleNodeMute(root.node)
         }
     }
 

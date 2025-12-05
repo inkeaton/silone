@@ -6,7 +6,7 @@ Item {
     id: trayMaster
     
     // Calculate width: Button + (Content + Spacing if open)
-    implicitHeight: 20
+    implicitHeight: 24
     implicitWidth: trayButton.width + (trayOpen ? (container.implicitWidth + layout.spacing) : 0)
     
     // Allows putting SystemTray {} inside Tray {} in Bar.qml
@@ -29,33 +29,30 @@ Item {
         anchors.fill: parent
         spacing: 8 
      
-        // Toggle Button (Always visible)
-        Rectangle {
+        // Toggle Button using the new ToggleButton component
+        ToggleButton {
             id: trayButton
             Layout.alignment: Qt.AlignVCenter
-            implicitWidth: 20
-            implicitHeight: 20
-            radius: trayOpen ? 4 : 30 // Circle normally
             
-            // Visual feedback for open state
-            color: trayOpen ? Styles.primary_fixed : Styles.primary
+            toggled: trayMaster.trayOpen
+            onClicked: trayMaster.trayOpen = !trayMaster.trayOpen
             
-            Behavior on color { ColorAnimation { duration: 150 } }
+            // Button appearance
+            buttonWidth: 24
+            buttonHeight: 24
             
-            // Arrow icon
-            Text {
-                anchors.centerIn: parent
-                text: trayOpen ? "›" : "‹" // Simple arrow toggle
-                color: Styles.surface
-                font.pixelSize: 14
-                font.bold: true
-            }
+            // Arrow icons
+            textOn: "›"
+            textOff: "‹"
             
-            MouseArea {
-                anchors.fill: parent
-                cursorShape: Qt.PointingHandCursor
-                onClicked: trayMaster.trayOpen = !trayMaster.trayOpen
-            }
+            // When open: rounded rect, when closed: circle
+            radiusOn: 6
+            radiusOff: 12
+            
+            // Colors
+            colorOn: Styles.primary_fixed
+            colorOff: Styles.primary
+            textColor: Styles.surface
         }
         
         // Content Container (Collapsible)

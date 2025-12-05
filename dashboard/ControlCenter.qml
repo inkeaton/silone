@@ -6,6 +6,7 @@ import Quickshell.Wayland
 import "../_styles"
 import "../_services"
 import "../_config"
+import "../_components"
 
 PanelWindow {
     id: dashboard
@@ -108,28 +109,26 @@ PanelWindow {
                 spacing: 10
 
                 // Mute Button
-                Rectangle {
-                    width: 32; height: 32; radius: 16
-                    color: muteMouse.containsMouse ? Styles.primary_container : "transparent"
-                    Behavior on color { ColorAnimation { duration: 150 } }
+                ToggleButton {
+                    buttonWidth: 32
+                    buttonHeight: 32
                     
-                    // Access Singleton directly
-                    readonly property bool isMuted: AudioService.muted
+                    toggled: AudioService.muted
                     
-                    Text {
-                        anchors.centerIn: parent
-                        text: parent.isMuted ? "🔇" : "🔊"
-                        font.pixelSize: 20
-                        color: Styles.primary
-                    }
+                    textOn: "🔇"
+                    textOff: "🔊"
+                    fontSize: 20
                     
-                    MouseArea {
-                        id: muteMouse
-                        anchors.fill: parent
-                        hoverEnabled: true
-                        cursorShape: Qt.PointingHandCursor
-                        onClicked: AudioService.toggleMute()
-                    }
+                    // Keep same color, just transparent/container on hover
+                    colorOn: "transparent"
+                    colorOff: "transparent"
+                    textColor: Styles.primary
+                    
+                    // Circle shape always
+                    radiusOn: 16
+                    radiusOff: 16
+                    
+                    onClicked: AudioService.toggleMute()
                 }
 
                 // MASTER SLIDER with device name above it

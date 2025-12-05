@@ -5,7 +5,7 @@ QtObject {
     // Default applications
     readonly property QtObject apps: QtObject {
         readonly property string terminal: "kitty"
-        readonly property string fileManager: "thunar"
+        readonly property string fileManager: "yazi"
         readonly property string browser: "firefox"
         readonly property string editor: "code"
     }
